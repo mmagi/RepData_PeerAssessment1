@@ -1,6 +1,7 @@
 # Reproducible Research: Peer Assessment 1
 first of all, set locale to english, and require packages, and other settings
-```{r}
+
+```r
 ret<-Sys.setlocale(locale ="English")
 require(ggplot2,quietly=TRUE)
 options(scipen = 1)
@@ -8,7 +9,8 @@ options(scipen = 1)
 
 ## Loading and preprocessing the data
 read data from the `activity.csv` inside `activity.zip`
-```{r}
+
+```r
 data <- read.csv(
   unz("activity.zip", "activity.csv"),
   colClasses = c("numeric", "Date", "numeric"), 
@@ -20,37 +22,45 @@ all transformations are processed during read, so no more step here.
 
 ## What is mean total number of steps taken per day?
 sum the steps by date, Calculate mean and median ,then plot a histgram
-```{r}
+
+```r
 dailystep<-aggregate(steps ~ date, data=data, FUN=sum)
 meandailystep <- mean(dailystep$steps)
 mediandailystep <- median(dailystep$steps)
 ggplot(dailystep,aes(x=date,y=steps))+geom_bar(stat='identity')
 ```
 
-so the mean is `r meandailystep` and median is `r mediandailystep`
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3.png) 
+
+so the mean is 10766.1887 and median is 10765
 
 
 ## What is the average daily activity pattern?
 average steps by interval, find the interval which has the max steps ,then plot the average
-```{r}
+
+```r
 perdaystep<-aggregate(steps ~ interval, data=data, FUN=mean)
 interval_maxstep <- perdaystep[which.max(perdaystep$steps),'interval']
 ggplot(perdaystep, aes(x = interval, y = steps)) + geom_line()
 ```
 
-so the `r interval_maxstep`th interval has the max steps
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4.png) 
+
+so the 835th interval has the max steps
 
 
 ## Imputing missing values
 
 
-```{r}
+
+```r
 numofna <- sum(is.na(data$steps))
 ```
-so, there are `r numofna` NA values in raw dataset.
+so, there are 2304 NA values in raw dataset.
 
 now fill it by use mean for that 5-minute interval
-```{r}
+
+```r
 nafilled<-data.frame(data);
 nafilled$steps<-apply(data,1,function(x){as.integer(
   ifelse(is.na(x['steps']),
@@ -61,21 +71,25 @@ nafilled$steps<-apply(data,1,function(x){as.integer(
 ```
 
 for the new dataset, sum the steps by date, Calculate mean and median ,then plot a histgram 
-```{r}
+
+```r
 nafilleddailystep<-aggregate(steps ~ date, data=nafilled, FUN=sum)
 nafilledmeandailystep <- mean(nafilleddailystep$steps)
 nafilledmediandailystep <- median(nafilleddailystep$steps)
 ggplot(nafilleddailystep,aes(x=date,y=steps))+geom_bar(stat='identity')
 ```
+
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7.png) 
  
-mean is `r meandailystep` and median is `r mediandailystep`,
+mean is 10766.1887 and median is 10765,
 thought here are obviously changes in the histgram, there is no major impact on mean and median, they are increasing very slightly 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
 add factor daytype, average steps by interval, then plot the average for each daytype
 
-```{r}
+
+```r
 data$daytype<-apply(data,1,function(x){
   wd<-weekdays(as.Date(x['date']))
   as.factor(ifelse(wd=="Saturday"||wd=="Sunday","weekend","weekday"))
@@ -83,3 +97,5 @@ data$daytype<-apply(data,1,function(x){
 perdaystep2 <-aggregate(steps ~ interval + daytype, data=data, FUN=sum)
 ggplot(perdaystep2, aes(x = interval, y = steps)) + geom_line() + facet_grid(daytype ~ .)
 ```
+
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8.png) 
