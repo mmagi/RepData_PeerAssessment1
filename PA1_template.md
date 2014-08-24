@@ -27,7 +27,7 @@ sum the steps by date, Calculate mean and median ,then plot a histgram
 dailystep<-aggregate(steps ~ date, data=data, FUN=sum)
 meandailystep <- mean(dailystep$steps)
 mediandailystep <- median(dailystep$steps)
-ggplot(dailystep,aes(x=date,y=steps))+geom_bar(stat='identity')
+ggplot(dailystep,aes(x=steps))+geom_histogram(binwidth=500)
 ```
 
 ![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3.png) 
@@ -76,13 +76,12 @@ for the new dataset, sum the steps by date, Calculate mean and median ,then plot
 nafilleddailystep<-aggregate(steps ~ date, data=nafilled, FUN=sum)
 nafilledmeandailystep <- mean(nafilleddailystep$steps)
 nafilledmediandailystep <- median(nafilleddailystep$steps)
-ggplot(nafilleddailystep,aes(x=date,y=steps))+geom_bar(stat='identity')
+ggplot(nafilleddailystep,aes(x=steps))+geom_histogram(binwidth=500)
 ```
 
 ![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7.png) 
  
-mean is 10766.1887 and median is 10765,
-thought here are obviously changes in the histgram, there is no major impact on mean and median, they are increasing very slightly 
+mean is 10766.1887 and median is 10765, there is no major impact on mean and median, they are increasing very slightly 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
@@ -94,7 +93,7 @@ data$daytype<-apply(data,1,function(x){
   wd<-weekdays(as.Date(x['date']))
   as.factor(ifelse(wd=="Saturday"||wd=="Sunday","weekend","weekday"))
 })
-perdaystep2 <-aggregate(steps ~ interval + daytype, data=data, FUN=sum)
+perdaystep2 <-aggregate(steps ~ interval + daytype, data=data, FUN=mean)
 ggplot(perdaystep2, aes(x = interval, y = steps)) + geom_line() + facet_grid(daytype ~ .)
 ```
 
